@@ -4,7 +4,7 @@ A web application for building personalized anti-inflammatory diet protocols bas
 
 ## Features
 
-- **115 Science-Backed Foods**: Comprehensive database of anti-inflammatory foods with evidence scores
+- **116 Science-Backed Foods**: Comprehensive database of anti-inflammatory foods with evidence scores
 - **Diet Templates**: Pre-built diet plans for different health goals
 - **Personalized Diet Builder**: Create and customize your own anti-inflammatory diet
 - **Evidence-Based Scoring**: Foods rated on 0-10 scale based on clinical studies

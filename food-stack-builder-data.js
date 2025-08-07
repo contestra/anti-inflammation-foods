@@ -1,5 +1,5 @@
 // Anti-Inflammatory Foods Database
-// 115 scientifically-validated foods with evidence-based scoring
+// 116 scientifically-validated foods with evidence-based scoring
 // Version 1.1 - December 2024
 
 // Evidence Score Calculation (0-10 scale)
@@ -1772,6 +1772,22 @@ const foods = [
     mechanisms: ['Substance P depletion', 'TRPV1 activation', 'Metabolic boost'],
     sideEffects: 'May cause digestive discomfort',
     interactions: []
+  },
+  {
+    id: 'bitter_melon',
+    name: 'Bitter Melon',
+    category: 'Other',
+    evidence: { score: 8.1, studies: 134 },
+    antiInflammatoryScore: 8.0,
+    servingSize: '1/2 cup sliced (45g)',
+    frequency: '2-3 times per week',
+    keyCompounds: ['Charantin', 'Vicine', 'Polypeptide-p', 'Momordicin'],
+    cost: '$3-6/lb',
+    preparation: 'Stir-fried, juiced, or tea',
+    description: 'Bitter gourd with potent anti-diabetic and anti-inflammatory effects',
+    mechanisms: ['Blood sugar regulation', 'AMPK activation', 'NF-κB inhibition'],
+    sideEffects: 'Very bitter taste, may lower blood sugar significantly',
+    interactions: ['diabetes medications']
   }
 ];
 
