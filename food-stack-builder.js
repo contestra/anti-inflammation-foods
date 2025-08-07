@@ -200,80 +200,105 @@ function renderFoods() {
     // Update container class based on view
     container.className = appState.currentView === 'grid' ? 'foods-grid' : 'foods-list';
     
-    // Create cards
-    filteredFoods.forEach(food => {
-        const card = createFoodCard(food);
-        container.appendChild(card);
+    // Render each food
+    filteredFoods.forEach((food, index) => {
+        const element = createFoodElement(food);
+        container.appendChild(element);
     });
     
-    // Create icons after adding to DOM
-    setTimeout(() => {
-        lucide.createIcons();
-    }, 0);
+    // Add a single banner after 6 items or at the end if fewer than 6
+    if (filteredFoods.length >= 6) {
+        // Insert banner after the 6th item
+        const sixthItem = container.children[5];
+        if (sixthItem) {
+            const banner = createProductBanner();
+            sixthItem.insertAdjacentElement('afterend', banner);
+        }
+    } else if (filteredFoods.length > 0) {
+        // If less than 6 items, add banner at the end
+        const banner = createProductBanner();
+        container.appendChild(banner);
+    }
+    
+    // Update icons
+    lucide.createIcons();
 }
 
-// Create food card
-function createFoodCard(food) {
-    const card = document.createElement('div');
-    const inStack = appState.myStack.some(s => s.id === food.id);
-    card.className = `food-card ${inStack ? 'in-stack' : ''}`;
+// Create product banner
+function createProductBanner() {
+    const banner = document.createElement('a');
+    banner.href = 'https://corhealth.com/#product';
+    banner.className = 'product-banner';
+    banner.style.gridColumn = '1 / -1'; // Span full width in grid
+    banner.innerHTML = `
+        <div class="product-banner-content">
+            <div class="product-banner-text">
+                Get the COR One™ and get clear, actionable data about your inflammation
+            </div>
+            <div class="product-banner-arrow">
+                <i data-lucide="arrow-right"></i>
+            </div>
+        </div>
+    `;
+    return banner;
+}
+
+// Create food element
+function createFoodElement(food) {
+    const template = appState.currentView === 'grid' 
+        ? document.getElementById('food-card-template')
+        : document.getElementById('food-list-item-template');
     
-    // Get the evidence score, handling both formats
-    let evidenceScore = typeof food.evidence === 'object' ? food.evidence.score : food.evidenceScore;
-    let antiInflammatoryScore = food.antiInflammatoryScore || food.antiInflammatoryPotential || 0;
+    const clone = template.content.cloneNode(true);
+    const element = clone.querySelector('.food-card, .food-list-item');
     
-    // Convert to 0-10 scale if needed (for any legacy data)
+    element.dataset.foodId = food.id;
+    element.querySelector('.food-name').textContent = food.name;
+    element.querySelector('.food-description').textContent = food.description;
+    element.querySelector('.food-category').textContent = food.category;
+    element.querySelector('.food-dose').textContent = food.servingSize || food.recommendedDose || '';
+    // Handle both old and new scoring systems
+    // Old system uses 0-100 scale, new system uses 0-10 scale
+    let evidenceScore = typeof food.evidence.score === 'number' 
+        ? food.evidence.score 
+        : (food.evidence.score || 0);
+    
+    // Convert to 0-10 scale if needed
     if (evidenceScore > 10) {
         evidenceScore = evidenceScore / 10;
     }
-    if (antiInflammatoryScore > 10) {
-        antiInflammatoryScore = antiInflammatoryScore / 10;
+    
+    let antiInflamScore = food.antiInflammatoryScore || food.antiInflammatoryPotential || 0;
+    
+    // Convert to 0-10 scale if needed
+    if (antiInflamScore > 10) {
+        antiInflamScore = antiInflamScore / 10;
     }
     
-    // Format scores to 1 decimal place
-    evidenceScore = evidenceScore.toFixed(1);
-    antiInflammatoryScore = antiInflammatoryScore.toFixed(1);
+    element.querySelector('.evidence-badge').textContent = `Evidence: ${evidenceScore.toFixed(1)}/10`;
+    element.querySelector('.safety-badge').textContent = `Anti-Inflammatory: ${antiInflamScore.toFixed(1)}/10`;
     
-    card.innerHTML = `
-        <div class="card-header">
-            <h3>${food.name}</h3>
-            <span class="category-badge">${food.category.replace(/_/g, ' ')}</span>
-        </div>
-        <div class="card-content">
-            <p class="description">${food.description}</p>
-            <div class="scores">
-                <span class="score">Evidence: ${evidenceScore}/10</span>
-                <span class="score">Anti-Inflammatory: ${antiInflammatoryScore}/10</span>
-            </div>
-            <div class="serving-info">
-                <p><strong>Serving:</strong> ${food.servingSize}</p>
-                <p><strong>Frequency:</strong> ${food.frequency}</p>
-                <p><strong>Cost:</strong> ${food.cost}</p>
-            </div>
-            <div class="key-compounds">
-                ${food.keyCompounds.slice(0, 3).map(compound => 
-                    `<span class="compound-tag">${compound}</span>`
-                ).join('')}
-            </div>
-        </div>
-        <div class="card-actions">
-            <button class="btn btn-secondary view-details-btn" onclick="showFoodDetails('${food.id}')">
-                <i data-lucide="info"></i>
-                Details
-            </button>
-            <button class="btn ${inStack ? 'btn-success' : 'btn-primary'} add-to-stack-btn">
-                <i data-lucide="${inStack ? 'check' : 'plus'}"></i>
-                ${inStack ? 'In Stack' : 'Add to Stack'}
-            </button>
-        </div>
-    `;
+    // Check if already in stack
+    const inStack = appState.myStack.some(item => item.food.id === food.id);
+    const addBtn = element.querySelector('.add-to-stack-btn');
     
-    // Add event listener to the add button
-    const addBtn = card.querySelector('.add-to-stack-btn');
+    if (inStack) {
+        addBtn.innerHTML = '<i data-lucide="check"></i> In Diet';
+        addBtn.classList.add('in-stack');
+    }
+    
+    // Add event listeners - handle both grid and list views
+    const detailsBtn = element.querySelector('.view-details-btn');
+    if (detailsBtn) {
+        detailsBtn.addEventListener('click', () => showFoodDetails(food));
+    }
+    
+    // Add click handler for add to stack button
     if (addBtn) {
         addBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            console.log('Add to stack clicked for:', food.name);
             if (inStack) {
                 removeFromStack(food.id);
             } else {
@@ -282,473 +307,406 @@ function createFoodCard(food) {
         });
     }
     
-    return card;
+    return element;
 }
 
 // Show food details modal
-function showFoodDetails(foodId) {
-    const food = foods.find(f => f.id === foodId);
-    if (!food) return;
-    
+function showFoodDetails(food) {
     const modal = document.getElementById('food-modal');
-    const modalContent = document.getElementById('modal-content');
+    const modalBody = modal.querySelector('.modal-body');
+    const inStack = appState.myStack.some(item => item.food.id === food.id);
     
-    // Get scores in correct format
-    let evidenceScore = typeof food.evidence === 'object' ? food.evidence.score : food.evidenceScore;
-    let antiInflammatoryScore = food.antiInflammatoryScore || food.antiInflammatoryPotential || 0;
-    let studyCount = typeof food.evidence === 'object' ? food.evidence.studies : 0;
-    
-    modalContent.innerHTML = `
-        <h2>${food.name}</h2>
-        <div class="modal-section">
-            <h3>Overview</h3>
-            <p>${food.description}</p>
-            <p><strong>Category:</strong> ${food.category.replace(/_/g, ' ')}</p>
+    modalBody.innerHTML = `
+        <div class="modal-header">
+            <h2>${food.name}</h2>
+            <div class="modal-badges">
+                <span class="evidence-badge">Evidence: ${((food.evidence.score > 10 ? food.evidence.score / 10 : food.evidence.score) || 0).toFixed(1)}/10 (${food.evidence.studies || 0} studies)</span>
+                <span class="safety-badge">Anti-Inflammatory: ${(((food.antiInflammatoryScore || food.antiInflammatoryPotential || 0) > 10 ? (food.antiInflammatoryScore || food.antiInflammatoryPotential) / 10 : (food.antiInflammatoryScore || food.antiInflammatoryPotential)) || 0).toFixed(1)}/10</span>
+            </div>
         </div>
         
         <div class="modal-section">
-            <h3>Evidence & Scores</h3>
-            <div class="modal-scores">
-                <div class="score-item">
-                    <span class="score-label">Evidence Score:</span>
-                    <span class="score-value">${evidenceScore.toFixed(1)}/10</span>
-                    ${studyCount ? `<small>(${studyCount} studies)</small>` : ''}
-                </div>
-                <div class="score-item">
-                    <span class="score-label">Anti-Inflammatory Score:</span>
-                    <span class="score-value">${antiInflammatoryScore.toFixed(1)}/10</span>
-                </div>
-            </div>
+            <h3>Description</h3>
+            <p>${food.description}</p>
         </div>
         
         <div class="modal-section">
             <h3>Serving Information</h3>
-            <p><strong>Serving Size:</strong> ${food.servingSize}</p>
-            <p><strong>Recommended Frequency:</strong> ${food.frequency}</p>
-            <p><strong>Typical Cost:</strong> ${food.cost}</p>
-            <p><strong>Preparation:</strong> ${food.preparation}</p>
+            <p><strong>Serving Size:</strong> ${food.servingSize || 'N/A'}</p>
+            <p><strong>Frequency:</strong> ${food.frequency || 'Daily'}</p>
+            ${food.cost ? `<p><strong>Typical Cost:</strong> ${food.cost}</p>` : ''}
+            ${food.preparation ? `<p><strong>Preparation:</strong> ${food.preparation}</p>` : ''}
         </div>
         
-        <div class="modal-section">
-            <h3>Key Compounds</h3>
-            <div class="compounds-list">
-                ${food.keyCompounds.map(compound => 
-                    `<span class="compound-tag">${compound}</span>`
-                ).join('')}
+        ${food.keyCompounds && food.keyCompounds.length > 0 ? `
+            <div class="modal-section">
+                <h3>Key Anti-Inflammatory Compounds</h3>
+                <ul>
+                    ${food.keyCompounds.map(compound => `<li>${compound}</li>`).join('')}
+                </ul>
             </div>
-        </div>
+        ` : ''}
         
-        <div class="modal-section">
-            <h3>Mechanisms of Action</h3>
-            <ul>
-                ${food.mechanisms.map(mechanism => `<li>${mechanism}</li>`).join('')}
-            </ul>
-        </div>
+        ${food.mechanisms && food.mechanisms.length > 0 ? `
+            <div class="modal-section">
+                <h3>Mechanisms of Action</h3>
+                <ul>
+                    ${food.mechanisms.map(mechanism => `<li>${mechanism}</li>`).join('')}
+                </ul>
+            </div>
+        ` : ''}
         
-        ${food.sideEffects ? `
-        <div class="modal-section">
-            <h3>Important Notes</h3>
-            <p>${food.sideEffects}</p>
-        </div>
+        ${food.sideEffects && food.sideEffects !== '' ? `
+            <div class="modal-section">
+                <h3>Notes & Considerations</h3>
+                <p>${Array.isArray(food.sideEffects) ? food.sideEffects.join(', ') : food.sideEffects}</p>
+            </div>
         ` : ''}
         
         ${food.interactions && food.interactions.length > 0 ? `
-        <div class="modal-section">
-            <h3>Food Combinations</h3>
-            <ul>
-                ${food.interactions.map(interaction => `<li>${interaction}</li>`).join('')}
-            </ul>
-        </div>
+            <div class="modal-section">
+                <h3>Food Interactions</h3>
+                <ul>
+                    ${food.interactions.map(interaction => `<li>${interaction}</li>`).join('')}
+                </ul>
+            </div>
         ` : ''}
         
-        <div class="modal-actions">
-            <button class="btn btn-primary" onclick="addToStackFromModal('${food.id}')">
-                <i data-lucide="plus"></i>
-                Add to Stack
+        ${food.evidenceBreakdown ? `
+            <div class="modal-section">
+                <h3>Evidence Breakdown</h3>
+                <div class="evidence-breakdown">
+                    <p><strong>Study Portfolio:</strong><br>
+                    ${food.evidenceBreakdown.studyCount} total studies<br>
+                    ${food.evidenceBreakdown.studyTypes.map(type => `• ${type}`).join('<br>')}</p>
+                    
+                    <p><strong>Effect Size:</strong><br>
+                    ${food.evidenceBreakdown.effectSize}</p>
+                    
+                    <p><strong>Mechanism:</strong><br>
+                    ${food.evidenceBreakdown.mechanism}</p>
+                    
+                    <p><strong>Safety:</strong><br>
+                    ${food.evidenceBreakdown.safety}</p>
+                    
+                    <p><strong>Key Study:</strong><br>
+                    ${food.evidenceBreakdown.bestStudy}</p>
+                </div>
+            </div>
+        ` : ''}
+        
+        <div class="modal-section">
+            <button class="btn-primary ${inStack ? 'in-stack' : ''}" onclick="toggleStackItem(foods.find(s => s.id === '${food.id}'))">
+                <i data-lucide="${inStack ? 'check' : 'plus'}"></i>
+                ${inStack ? 'In Diet' : 'Add to Diet'}
             </button>
         </div>
     `;
     
-    modal.style.display = 'block';
-    setTimeout(() => {
-        lucide.createIcons();
-    }, 0);
+    modal.classList.remove('hidden');
+    lucide.createIcons();
 }
 
 // Close modal
 function closeModal() {
-    const modal = document.getElementById('food-modal');
-    modal.style.display = 'none';
+    document.getElementById('food-modal').classList.add('hidden');
 }
 
-// Add to stack from modal
-function addToStackFromModal(foodId) {
-    const food = foods.find(f => f.id === foodId);
-    if (food) {
+// Toggle stack item
+function toggleStackItem(food) {
+    const inStack = appState.myStack.some(item => item.food.id === food.id);
+    
+    if (inStack) {
+        removeFromStack(food.id);
+    } else {
         addToStack(food);
-        closeModal();
     }
 }
 
-// Add food to stack
+// Add to stack
 function addToStack(food) {
-    if (!appState.myStack.some(f => f.id === food.id)) {
-        appState.myStack.push(food);
-        saveState();
-        updateStackCount();
-        if (appState.currentTab === 'browse') {
-            renderFoods();
-        } else if (appState.currentTab === 'mystack') {
-            updateStackUI();
-        }
-        checkSynergies();
-    }
-}
-
-// Remove food from stack
-function removeFromStack(foodId) {
-    appState.myStack = appState.myStack.filter(f => f.id !== foodId);
-    saveState();
-    updateStackCount();
-    if (appState.currentTab === 'browse') {
-        renderFoods();
-    } else if (appState.currentTab === 'mystack') {
-        updateStackUI();
-    }
-    checkSynergies();
-}
-
-// Update stack count in UI
-function updateStackCount() {
-    const countElement = document.querySelector('.stack-count');
-    if (countElement) {
-        countElement.textContent = appState.myStack.length;
-    }
-}
-
-// Clear entire stack
-function clearStack() {
-    if (confirm('Are you sure you want to clear your entire food stack?')) {
-        appState.myStack = [];
-        saveState();
-        updateStackCount();
-        updateStackUI();
-        if (appState.currentTab === 'browse') {
-            renderFoods();
-        }
-    }
-}
-
-// Check for food synergies
-function checkSynergies() {
-    const synergiesList = [];
-    const stackIds = appState.myStack.map(f => f.id);
-    
-    if (typeof synergies !== 'undefined' && Array.isArray(synergies)) {
-        synergies.forEach(synergy => {
-            if (stackIds.includes(synergy.food1) && stackIds.includes(synergy.food2)) {
-                synergiesList.push(synergy);
-            }
-        });
-    }
-    
-    updateSynergiesDisplay(synergiesList);
-}
-
-// Update synergies display
-function updateSynergiesDisplay(synergiesList) {
-    const container = document.getElementById('synergies-container');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    if (synergiesList.length === 0) {
-        container.innerHTML = '<p class="no-synergies">No synergies detected. Try combining turmeric with black pepper or olive oil!</p>';
+    // Check if already in stack
+    if (appState.myStack.some(item => item.food.id === food.id)) {
         return;
     }
     
-    synergiesList.forEach(synergy => {
-        const food1 = foods.find(f => f.id === synergy.food1);
-        const food2 = foods.find(f => f.id === synergy.food2);
-        
-        const synergyCard = document.createElement('div');
-        synergyCard.className = 'synergy-card positive';
-        synergyCard.innerHTML = `
-            <div class="synergy-header">
-                <i data-lucide="zap"></i>
-                <strong>Synergy Found!</strong>
-            </div>
-            <p><strong>${food1.name} + ${food2.name}</strong></p>
-            <p>${synergy.description}</p>
-            <p class="recommendation">${synergy.recommendation}</p>
-        `;
-        container.appendChild(synergyCard);
+    // Add to stack
+    appState.myStack.push({
+        food: food,
+        multiplier: 1
     });
     
-    setTimeout(() => {
-        lucide.createIcons();
-    }, 0);
+    // Update UI
+    updateStackCount();
+    updateStackUI();
+    renderFoods(); // Re-render to update button states
+    saveState();
+    
+    // Close modal if open
+    closeModal();
+    
+    // Show success message
+    showNotification(`${food.name} added to your diet!`);
+}
+
+// Remove from stack
+function removeFromStack(foodId) {
+    const food = appState.myStack.find(item => item.food.id === foodId)?.food;
+    appState.myStack = appState.myStack.filter(item => item.food.id !== foodId);
+    updateStackCount();
+    updateStackUI();
+    renderFoods(); // Re-render to update button states
+    saveState();
+    
+    if (food) {
+        showNotification(`${food.name} removed from your diet`);
+    }
+}
+
+// Update stack count
+function updateStackCount() {
+    const countElement = document.querySelector('.stack-count');
+    if (countElement) {
+        countElement.textContent = `(${appState.myStack.length})`;
+    }
 }
 
 // Update stack UI
 function updateStackUI() {
-    const stackContainer = document.getElementById('stack-container');
-    const summaryContainer = document.getElementById('stack-summary');
-    
-    if (!stackContainer || !summaryContainer) return;
-    
-    // Clear containers
-    stackContainer.innerHTML = '';
-    
-    if (appState.myStack.length === 0) {
-        stackContainer.innerHTML = '<p class="empty-stack">Your food stack is empty. Browse foods to add them to your stack.</p>';
-        summaryContainer.innerHTML = '<p>Add foods to see stack summary</p>';
-        return;
-    }
-    
-    // Render stack items
-    appState.myStack.forEach(food => {
-        const stackItem = createStackItem(food);
-        stackContainer.appendChild(stackItem);
-    });
-    
-    // Calculate and display summary
-    const avgAntiInflammatory = appState.myStack.reduce((sum, f) => sum + (f.antiInflammatoryScore || 0), 0) / appState.myStack.length;
-    const avgEvidence = appState.myStack.reduce((sum, f) => {
-        const score = typeof f.evidence === 'object' ? f.evidence.score : f.evidenceScore;
-        return sum + (score || 0);
-    }, 0) / appState.myStack.length;
-    
-    // Get category distribution
-    const categories = {};
-    appState.myStack.forEach(food => {
-        categories[food.category] = (categories[food.category] || 0) + 1;
-    });
-    
-    const topCategories = Object.entries(categories)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([cat]) => cat.replace(/_/g, ' '));
-    
-    summaryContainer.innerHTML = `
-        <div class="summary-stats">
-            <div class="stat">
-                <span class="stat-label">Foods in Stack:</span>
-                <span class="stat-value">${appState.myStack.length}</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Avg Anti-Inflammatory Score:</span>
-                <span class="stat-value">${avgAntiInflammatory.toFixed(1)}/10</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Avg Evidence Score:</span>
-                <span class="stat-value">${avgEvidence.toFixed(1)}/10</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Top Categories:</span>
-                <span class="stat-value">${topCategories.join(', ')}</span>
-            </div>
-        </div>
-    `;
-    
-    // Check synergies
-    checkSynergies();
-    
-    // Create icons
-    setTimeout(() => {
-        lucide.createIcons();
-    }, 0);
-}
-
-// Create stack item
-function createStackItem(food) {
-    const item = document.createElement('div');
-    item.className = 'stack-item';
-    
-    let evidenceScore = typeof food.evidence === 'object' ? food.evidence.score : food.evidenceScore;
-    let antiInflammatoryScore = food.antiInflammatoryScore || 0;
-    
-    item.innerHTML = `
-        <div class="stack-item-header">
-            <h4>${food.name}</h4>
-            <button class="btn-icon" onclick="removeFromStack('${food.id}')">
-                <i data-lucide="trash-2"></i>
-            </button>
-        </div>
-        <div class="stack-item-content">
-            <p class="serving"><strong>Serving:</strong> ${food.servingSize}</p>
-            <p class="frequency"><strong>Frequency:</strong> ${food.frequency}</p>
-            <div class="scores">
-                <span>Evidence: ${evidenceScore.toFixed(1)}/10</span>
-                <span>Anti-Inflammatory: ${antiInflammatoryScore.toFixed(1)}/10</span>
-            </div>
-        </div>
-    `;
-    
-    return item;
-}
-
-// Export stack to text file
-function exportStack() {
-    if (appState.myStack.length === 0) {
-        alert('Your food stack is empty');
-        return;
-    }
-    
-    let exportText = 'MY ANTI-INFLAMMATORY FOOD STACK\n';
-    exportText += '=' .repeat(40) + '\n\n';
-    exportText += `Generated: ${new Date().toLocaleDateString()}\n\n`;
-    
-    // Stack summary
-    const avgAntiInflammatory = appState.myStack.reduce((sum, f) => sum + (f.antiInflammatoryScore || 0), 0) / appState.myStack.length;
-    const avgEvidence = appState.myStack.reduce((sum, f) => {
-        const score = typeof f.evidence === 'object' ? f.evidence.score : f.evidenceScore;
-        return sum + (score || 0);
-    }, 0) / appState.myStack.length;
-    
-    exportText += 'STACK SUMMARY\n';
-    exportText += '-'.repeat(20) + '\n';
-    exportText += `Total Foods: ${appState.myStack.length}\n`;
-    exportText += `Average Anti-Inflammatory Score: ${avgAntiInflammatory.toFixed(1)}/10\n`;
-    exportText += `Average Evidence Score: ${avgEvidence.toFixed(1)}/10\n\n`;
-    
-    // Foods list
-    exportText += 'FOODS IN YOUR STACK\n';
-    exportText += '-'.repeat(20) + '\n\n';
-    
-    appState.myStack.forEach((food, index) => {
-        exportText += `${index + 1}. ${food.name}\n`;
-        exportText += `   Category: ${food.category.replace(/_/g, ' ')}\n`;
-        exportText += `   Serving: ${food.servingSize}\n`;
-        exportText += `   Frequency: ${food.frequency}\n`;
-        exportText += `   Preparation: ${food.preparation}\n`;
-        exportText += `   Cost: ${food.cost}\n`;
-        exportText += `   Anti-Inflammatory Score: ${food.antiInflammatoryScore}/10\n`;
-        exportText += '\n';
-    });
-    
-    // Synergies
-    const synergiesList = [];
-    const stackIds = appState.myStack.map(f => f.id);
-    
-    if (typeof synergies !== 'undefined' && Array.isArray(synergies)) {
-        synergies.forEach(synergy => {
-            if (stackIds.includes(synergy.food1) && stackIds.includes(synergy.food2)) {
-                synergiesList.push(synergy);
-            }
-        });
-    }
-    
-    if (synergiesList.length > 0) {
-        exportText += 'FOOD SYNERGIES\n';
-        exportText += '-'.repeat(20) + '\n\n';
-        
-        synergiesList.forEach(synergy => {
-            const food1 = foods.find(f => f.id === synergy.food1);
-            const food2 = foods.find(f => f.id === synergy.food2);
-            exportText += `✓ ${food1.name} + ${food2.name}\n`;
-            exportText += `  ${synergy.description}\n`;
-            exportText += `  Recommendation: ${synergy.recommendation}\n\n`;
-        });
-    }
-    
-    // Shopping list
-    exportText += 'SHOPPING LIST\n';
-    exportText += '-'.repeat(20) + '\n';
-    
-    const categories = {};
-    appState.myStack.forEach(food => {
-        if (!categories[food.category]) {
-            categories[food.category] = [];
-        }
-        categories[food.category].push(food.name);
-    });
-    
-    Object.entries(categories).forEach(([category, items]) => {
-        exportText += `\n${category.replace(/_/g, ' ').toUpperCase()}:\n`;
-        items.forEach(item => {
-            exportText += `  □ ${item}\n`;
-        });
-    });
-    
-    exportText += '\n' + '='.repeat(40) + '\n';
-    exportText += 'Note: Consult with a healthcare provider before making significant dietary changes.\n';
-    
-    // Download file
-    const blob = new Blob([exportText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `food-stack-${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-// Render diet templates
-function renderTemplates() {
-    const container = document.getElementById('templates-container');
+    const container = document.getElementById('stack-items');
     if (!container) return;
     
     container.innerHTML = '';
     
-    if (typeof dietTemplates === 'undefined' || !Array.isArray(dietTemplates)) {
-        container.innerHTML = '<p>Loading templates...</p>';
+    if (appState.myStack.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i data-lucide="package"></i>
+                <p>Your diet is empty. Add foods to get started!</p>
+            </div>
+        `;
+    } else {
+        appState.myStack.forEach(item => {
+            const element = createStackItemElement(item);
+            container.appendChild(element);
+        });
+    }
+    
+    // Update synergies
+    updateSynergies();
+    
+    // Update summary
+    updateStackSummary();
+    
+    // Add banner at the bottom of My Stack page
+    const stackContainer = document.querySelector('.stack-container');
+    if (stackContainer) {
+        // Remove any existing banner first
+        const existingBanner = stackContainer.querySelector('.product-banner');
+        if (existingBanner) {
+            existingBanner.remove();
+        }
+        // Add new banner
+        const banner = createProductBanner();
+        banner.style.marginTop = '3rem';
+        stackContainer.appendChild(banner);
+    }
+    
+    // Update icons
+    lucide.createIcons();
+}
+
+// Create stack item element
+function createStackItemElement(item) {
+    const template = document.getElementById('stack-item-template');
+    const clone = template.content.cloneNode(true);
+    const element = clone.querySelector('.stack-item');
+    
+    element.dataset.foodId = item.food.id;
+    element.querySelector('.stack-item-name').textContent = item.food.name;
+    element.querySelector('.stack-item-dose').textContent = item.food.servingSize || item.food.recommendedDose || '';
+    
+    const multiplierInput = element.querySelector('.dose-multiplier');
+    multiplierInput.value = item.multiplier;
+    multiplierInput.addEventListener('change', (e) => {
+        const newMultiplier = parseFloat(e.target.value);
+        if (newMultiplier >= 0.5 && newMultiplier <= 5) {
+            item.multiplier = newMultiplier;
+            updateStackSummary();
+            saveState();
+        }
+    });
+    
+    element.querySelector('.remove-from-stack-btn').addEventListener('click', () => {
+        removeFromStack(item.food.id);
+    });
+    
+    return element;
+}
+
+// Update synergies
+function updateSynergies() {
+    const panel = document.getElementById('synergies-panel');
+    const list = document.getElementById('synergies-list');
+    if (!panel || !list) return;
+    
+    list.innerHTML = '';
+    
+    // Check if synergies is defined
+    if (typeof synergies === 'undefined' || !Array.isArray(synergies)) {
+        panel.classList.add('hidden');
         return;
     }
     
-    dietTemplates.forEach(template => {
-        const templateCard = createTemplateCard(template);
-        container.appendChild(templateCard);
+    const stackIds = appState.myStack.map(item => item.food.id);
+    const relevantSynergies = synergies.filter(interaction => {
+        const [supp1, supp2] = interaction.foods || [];
+        return stackIds.includes(supp1) && stackIds.includes(supp2);
     });
     
-    setTimeout(() => {
-        lucide.createIcons();
-    }, 0);
+    if (relevantSynergies.length === 0) {
+        panel.classList.add('hidden');
+    } else {
+        panel.classList.remove('hidden');
+        
+        relevantSynergies.forEach(interaction => {
+            const item = document.createElement('div');
+            item.className = 'interaction-item';
+            
+            const [supp1Id, supp2Id] = interaction.foods;
+            const supp1 = foods.find(s => s.id === supp1Id);
+            const supp2 = foods.find(s => s.id === supp2Id);
+            
+            item.innerHTML = `
+                <span class="interaction-severity ${interaction.severity}">${interaction.severity.toUpperCase()}</span>
+                <strong>${supp1.name} + ${supp2.name}:</strong> ${interaction.description}
+            `;
+            
+            list.appendChild(item);
+        });
+    }
 }
 
-// Create template card
-function createTemplateCard(template) {
-    const card = document.createElement('div');
-    card.className = 'template-card';
+// Update stack summary
+function updateStackSummary() {
+    // No longer displaying cost/servings summary for foods
+    // Kept for compatibility but does nothing
+}
+
+// Clear stack
+function clearStack() {
+    if (confirm('Are you sure you want to clear your entire diet?')) {
+        appState.myStack = [];
+        updateStackCount();
+        updateStackUI();
+        renderFoods();
+        saveState();
+        showNotification('Diet cleared!');
+    }
+}
+
+// Export stack
+function exportStack() {
+    if (appState.myStack.length === 0) {
+        alert('Your diet is empty!');
+        return;
+    }
     
-    // Calculate template score
-    const templateFoods = foods.filter(f => template.foods.includes(f.id));
-    const avgScore = templateFoods.reduce((sum, f) => sum + (f.antiInflammatoryScore || 0), 0) / templateFoods.length;
+    let exportText = 'MY ANTI-INFLAMMATORY DIET\n';
+    exportText += '=====================================\n\n';
     
-    card.innerHTML = `
-        <div class="template-header">
-            <h3>${template.name}</h3>
-            <span class="popularity">${template.popularity}% Popular</span>
+    appState.myStack.forEach(item => {
+        exportText += `${item.food.name}\n`;
+        exportText += `Serving: ${item.food.servingSize || item.food.recommendedDose || 'N/A'}`;
+        if (item.multiplier !== 1) {
+            exportText += ` (${item.multiplier}x)`;
+        }
+        exportText += `\nFrequency: ${item.food.frequency || item.food.timing || 'Daily'}\n`;
+        exportText += `Cost: ${item.food.costPerDay ? `$${(item.food.costPerDay * item.multiplier).toFixed(2)}/day` : 'Varies'}\n\n`;
+    });
+    
+    const totalCost = appState.myStack.reduce((sum, item) => {
+        return sum + ((item.food.costPerDay || 0) * item.multiplier);
+    }, 0);
+    
+    exportText += totalCost > 0 ? `\nTOTAL ESTIMATED DAILY COST: $${totalCost.toFixed(2)}\n` : '\nTOTAL COST: Varies by location\n';
+    
+    // Check for synergies (if synergies data is available)
+    if (typeof synergies !== 'undefined' && Array.isArray(synergies)) {
+        const stackIds = appState.myStack.map(item => item.food.id);
+        const relevantSynergies = synergies.filter(interaction => {
+            const [supp1, supp2] = interaction.foods || [];
+            return stackIds.includes(supp1) && stackIds.includes(supp2);
+        });
+    
+        if (relevantSynergies.length > 0) {
+            exportText += '\nPOTENTIAL INTERACTIONS:\n';
+            relevantSynergies.forEach(interaction => {
+                const [supp1Id, supp2Id] = interaction.foods;
+                const supp1 = foods.find(s => s.id === supp1Id);
+                const supp2 = foods.find(s => s.id === supp2Id);
+                if (supp1 && supp2) {
+                    exportText += `- ${supp1.name} + ${supp2.name}: ${interaction.description}\n`;
+                }
+            });
+        }
+    }
+    
+    // Create download
+    const blob = new Blob([exportText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'my-anti-inflammatory-diet.txt';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    showNotification('Diet exported successfully!');
+}
+
+// Render templates
+function renderTemplates() {
+    const container = document.querySelector('.templates-grid');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    dietTemplates.forEach(template => {
+        const element = createTemplateElement(template);
+        container.appendChild(element);
+    });
+    
+    // Add banner at the end
+    const banner = createProductBanner();
+    banner.style.marginTop = '3rem';
+    container.appendChild(banner);
+    
+    lucide.createIcons();
+}
+
+// Create template element
+function createTemplateElement(template) {
+    const div = document.createElement('div');
+    div.className = 'template-card';
+    
+    div.innerHTML = `
+        <div class="template-icon">
+            <i data-lucide="${template.icon}"></i>
         </div>
+        <h3 class="template-name">${template.name}</h3>
         <p class="template-description">${template.description}</p>
-        <div class="template-stats">
-            <span>Foods: ${template.foods.length}</span>
-            <span>Avg Score: ${avgScore.toFixed(1)}/10</span>
-        </div>
-        <div class="template-foods">
-            ${templateFoods.slice(0, 3).map(f => 
-                `<span class="food-tag">${f.name}</span>`
-            ).join('')}
-            ${template.foods.length > 3 ? `<span class="more">+${template.foods.length - 3} more</span>` : ''}
-        </div>
-        <button class="btn btn-primary apply-template-btn" onclick="applyTemplate('${template.id}')">
-            <i data-lucide="download"></i>
-            Apply Template
-        </button>
+        <p class="template-count">${template.foods.length} foods</p>
     `;
     
-    return card;
+    div.addEventListener('click', () => applyTemplate(template));
+    
+    return div;
 }
 
-// Apply diet template
-function applyTemplate(templateId) {
-    const template = dietTemplates.find(t => t.id === templateId);
-    if (!template) return;
-    
+// Apply template
+function applyTemplate(template) {
     if (appState.myStack.length > 0) {
-        if (!confirm('This will replace your current stack. Continue?')) {
+        if (!confirm('This will replace your current diet. Continue?')) {
             return;
         }
     }
@@ -756,34 +714,64 @@ function applyTemplate(templateId) {
     appState.myStack = [];
     
     template.foods.forEach(foodId => {
-        const food = foods.find(f => f.id === foodId);
+        const food = foods.find(s => s.id === foodId);
         if (food) {
-            appState.myStack.push(food);
+            appState.myStack.push({
+                food: food,
+                multiplier: 1
+            });
         }
     });
     
-    saveState();
     updateStackCount();
+    updateStackUI();
+    renderFoods();
+    saveState();
+    
+    // Switch to My Stack tab
     switchTab('mystack');
     
-    // Show notification
+    showNotification(`Applied "${template.name}" template!`);
+}
+
+// Show notification
+function showNotification(message) {
+    // Create notification element
     const notification = document.createElement('div');
-    notification.className = 'notification success';
-    notification.innerHTML = `
-        <i data-lucide="check-circle"></i>
-        Template "${template.name}" applied successfully!
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #2ecc71;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1001;
+        animation: slideIn 0.3s ease-out;
     `;
+    notification.textContent = message;
+    
+    // Add animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+    `;
+    document.head.appendChild(style);
+    
     document.body.appendChild(notification);
     
+    // Remove after 3 seconds
     setTimeout(() => {
-        lucide.createIcons();
-        notification.classList.add('show');
-    }, 100);
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        notification.style.animationFillMode = 'forwards';
+        
         setTimeout(() => {
-            document.body.removeChild(notification);
+            notification.remove();
+            style.remove();
         }, 300);
     }, 3000);
 }

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Data Loading</title>
+</head>
+<body>
+    <h1>Testing Data Load</h1>
+    <div id="output"></div>
+    
+    <script src="food-stack-builder-data.js"></script>
+    <script>
+        const output = document.getElementById('output');
+        if (typeof foods !== 'undefined') {
+            output.innerHTML = `<p>✓ Foods loaded: ${foods.length} items</p>`;
+            output.innerHTML += `<p>✓ First food: ${foods[0].name}</p>`;
+        } else {
+            output.innerHTML = '<p>✗ Foods not loaded</p>';
+        }
+        
+        if (typeof synergies !== 'undefined') {
+            output.innerHTML += `<p>✓ Synergies loaded: ${synergies.length} items</p>`;
+        } else {
+            output.innerHTML += '<p>✗ Synergies not loaded</p>';
+        }
+        
+        if (typeof dietTemplates !== 'undefined') {
+            output.innerHTML += `<p>✓ Templates loaded: ${dietTemplates.length} items</p>`;
+        } else {
+            output.innerHTML += '<p>✗ Templates not loaded</p>';
+        }
+    </script>
+</body>
+</html>

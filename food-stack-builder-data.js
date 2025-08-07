@@ -2,6 +2,43 @@
 // 100 scientifically-validated foods with evidence-based scoring
 // Version 1.0 - December 2024
 
+// Evidence Score Calculation (0-10 scale)
+// Clinically reproducible scoring based on study counts
+function calculateEvidenceScore(metaAnalyses = 0, rcts = 0, otherStudies = 0) {
+  const maPoints = Math.log(1 + metaAnalyses);
+  const rctPoints = Math.log(1 + rcts);
+  const otherPoints = Math.log(1 + otherStudies);
+  
+  const raw = 0.4 * maPoints + 0.4 * rctPoints + 0.2 * otherPoints;
+  // Normalize: 3.0 ≈ score if MA=10, RCT=50
+  return Math.min(10, (raw / 3.0) * 10);
+}
+
+// Anti-Inflammatory Score Calculation (0-10 scale)
+// Based on documented percentage reductions in inflammatory markers
+function calculateAntiInflammatoryScore(reductions = {}) {
+  // Convert percentage reductions to 0-10 subscores
+  // 0% = 0, ≥40% = 10, linear in between
+  const toSubscore = (percent) => Math.min(10, Math.max(0, (percent / 40) * 10));
+  
+  const weights = {
+    esr: 0.35,    // Global marker, cheap, frequently reported
+    crp: 0.25,    // Acute-phase, widely cited
+    il6: 0.15,    // Upstream cytokine
+    tnfa: 0.15,   // Cytokine, joint diseases
+    nfkb: 0.10    // Master switch
+  };
+  
+  let totalScore = 0;
+  totalScore += weights.esr * toSubscore(reductions.esr || 0);
+  totalScore += weights.crp * toSubscore(reductions.crp || 0);
+  totalScore += weights.il6 * toSubscore(reductions.il6 || 0);
+  totalScore += weights.tnfa * toSubscore(reductions.tnfa || 0);
+  totalScore += weights.nfkb * toSubscore(reductions.nfkb || 0);
+  
+  return Math.round(totalScore * 10) / 10; // Round to 1 decimal
+}
+
 const foods = [
   // FATTY FISH (10 foods)
   {
@@ -1003,7 +1040,7 @@ const foods = [
     preparation: 'Cold use only - salad dressings',
     description: 'Omega-3 rich finishing oil',
     mechanisms: ['ALA omega-3 delivery', 'Antioxidant activity'],
-    sideEffects: 'Don't heat - oxidizes easily',
+    sideEffects: 'Never heat - oxidizes easily',
     interactions: []
   },
   {
@@ -1471,56 +1508,64 @@ const dietTemplates = [
     name: 'Mediterranean Anti-Inflammatory',
     foods: ['olive_oil', 'salmon', 'walnuts', 'spinach', 'blueberries', 'garlic', 'tomatoes'],
     description: 'Evidence-based Mediterranean pattern for longevity',
-    popularity: 95
+    popularity: 95,
+    icon: 'heart'
   },
   {
     id: 'brain_health',
     name: 'Brain Health Foods',
     foods: ['blueberries', 'salmon', 'walnuts', 'green_tea', 'turmeric', 'broccoli', 'dark_chocolate'],
     description: 'Cognitive protection and neuroinflammation reduction',
-    popularity: 85
+    popularity: 85,
+    icon: 'brain'
   },
   {
     id: 'joint_support',
     name: 'Joint Support Foods',
     foods: ['tart_cherries', 'salmon', 'turmeric', 'ginger', 'kale', 'olive_oil', 'bone_broth'],
     description: 'Natural foods for joint inflammation relief',
-    popularity: 80
+    popularity: 80,
+    icon: 'activity'
   },
   {
     id: 'heart_healthy',
     name: 'Heart-Healthy Stack',
     foods: ['olive_oil', 'sardines', 'flaxseeds', 'avocado', 'green_tea', 'garlic', 'oats'],
     description: 'Cardiovascular inflammation protection',
-    popularity: 90
+    popularity: 90,
+    icon: 'heart'
   },
   {
     id: 'gut_health',
     name: 'Gut Healing Foods',
     foods: ['bone_broth', 'ginger', 'turmeric', 'cabbage', 'garlic', 'green_tea', 'flaxseeds'],
     description: 'Foods to reduce gut inflammation',
-    popularity: 75
+    popularity: 75,
+    icon: 'target'
   },
   {
     id: 'athletic_recovery',
     name: 'Athletic Recovery',
     foods: ['tart_cherries', 'salmon', 'turmeric', 'ginger', 'blueberries', 'walnuts', 'green_tea'],
     description: 'Reduce exercise-induced inflammation',
-    popularity: 70
+    popularity: 70,
+    icon: 'zap'
   },
   {
     id: 'autoimmune',
     name: 'Autoimmune Support',
     foods: ['salmon', 'turmeric', 'ginger', 'green_tea', 'broccoli', 'olive_oil', 'mushrooms'],
     description: 'Foods to modulate immune response',
-    popularity: 65
+    popularity: 65,
+    icon: 'shield'
   },
   {
     id: 'beginner',
     name: 'Beginner Anti-Inflammatory',
     foods: ['salmon', 'blueberries', 'spinach', 'olive_oil', 'green_tea'],
     description: 'Easy-to-find anti-inflammatory foods',
-    popularity: 100
+    popularity: 100,
+    icon: 'star'
   }
 ];
 

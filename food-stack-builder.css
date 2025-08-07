@@ -149,9 +149,10 @@ body {
     width: 100%;
     padding: 1rem 1.5rem 1rem 4.5rem;
     border: 2px solid #e5e5e5;
-    border-radius: 8px;
+    border-radius: 40px;
     font-size: 1.6rem;
-    transition: border-color 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.3s ease;
 }
 
 .search-input:focus {
@@ -159,48 +160,62 @@ body {
     border-color: rgb(4, 61, 85);
 }
 
-.control-group {
+.controls-right {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     align-items: center;
 }
 
 .sort-select {
-    padding: 1rem 3rem 1rem 1.5rem;
+    padding: 1rem 1.5rem;
     border: 2px solid #e5e5e5;
-    border-radius: 8px;
+    border-radius: 40px;
     font-size: 1.6rem;
-    background: white;
+    font-family: 'DM Sans', sans-serif;
+    background-color: white;
     cursor: pointer;
+    transition: border-color 0.3s ease;
 }
 
-.view-buttons {
+.sort-select:focus {
+    outline: none;
+    border-color: rgb(4, 61, 85);
+}
+
+.view-toggle {
     display: flex;
     gap: 0.5rem;
 }
 
 .view-button {
     padding: 0.8rem;
-    background: white;
-    border: 2px solid #e5e5e5;
-    border-radius: 8px;
+    border: 2px solid #e5e5e5 !important;
+    background-color: white;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .view-button:hover {
-    border-color: rgb(4, 61, 85);
+    border: 2px solid rgb(4, 61, 85) !important;
+    background-color: rgba(4, 61, 85, 0.05);
 }
 
 .view-button.active {
     background-color: rgb(4, 61, 85);
-    border-color: rgb(4, 61, 85);
+    border: 2px solid rgb(4, 61, 85) !important;
     color: white;
 }
 
 .view-button svg {
     width: 20px;
     height: 20px;
+    display: block;
 }
 
 /* Category Filters */
@@ -208,21 +223,25 @@ body {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
 }
 
 .category-chip {
     padding: 0.8rem 1.6rem;
-    background: white;
     border: 2px solid #e5e5e5;
-    border-radius: 20px;
+    border-radius: 40px;
+    background-color: white;
     font-size: 1.4rem;
+    font-weight: 500;
+    color: rgba(4, 61, 85, 0.7);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
 }
 
 .category-chip:hover {
-    border-color: rgb(4, 61, 85);
+    border: 2px solid rgb(4, 61, 85);
+    color: rgb(4, 61, 85);
+    transform: none;
 }
 
 .category-chip.active {
@@ -231,292 +250,261 @@ body {
     color: white;
 }
 
-/* Foods Grid and List */
+/* Foods Grid */
 .foods-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
-    margin-bottom: 3rem;
+    min-height: 400px; /* Prevent height collapse */
+    width: 100%; /* Ensure full width */
 }
 
-.foods-list {
+/* Food Card - Unified styling for both grid and list views */
+.food-card,
+.food-list-item {
+    background-color: white;
+    border: 2px solid #e5e5e5;
+    border-radius: 2.2rem;
+    padding: 2rem;
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 3rem;
 }
 
-/* Food Card */
-.food-card {
-    background: white;
-    border: 2px solid #e5e5e5;
-    border-radius: 12px;
-    padding: 2rem;
-    transition: all 0.2s;
+.food-card:hover,
+.food-list-item:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    border-color: rgba(4, 61, 85, 0.3);
 }
 
-.food-card:hover {
-    box-shadow: 0 4px 12px rgba(4, 61, 85, 0.1);
-    transform: translateY(-2px);
-}
-
-.food-card.in-stack {
-    border-color: #27ae60;
-    background-color: #f0f9f4;
-}
-
-.foods-list .food-card {
+.food-header,
+.list-item-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 1rem;
-}
-
-.card-header h3 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: rgb(4, 61, 85);
-}
-
-.category-badge {
-    padding: 0.4rem 0.8rem;
-    background-color: rgba(4, 61, 85, 0.1);
-    color: rgb(4, 61, 85);
-    border-radius: 6px;
-    font-size: 1.2rem;
-    font-weight: 500;
-    text-transform: capitalize;
-}
-
-.card-content {
+    align-items: flex-start;
     margin-bottom: 1.5rem;
 }
 
-.description {
+.food-header .view-details-btn,
+.list-item-header .view-details-btn {
+    padding: 0.6rem 1.2rem;
     font-size: 1.4rem;
-    color: rgba(4, 61, 85, 0.8);
-    margin-bottom: 1rem;
 }
 
-.scores {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.score {
-    font-size: 1.4rem;
-    font-weight: 500;
-}
-
-.serving-info {
-    font-size: 1.3rem;
-    color: rgba(4, 61, 85, 0.7);
-    margin-bottom: 1rem;
-}
-
-.serving-info p {
-    margin-bottom: 0.4rem;
-}
-
-.key-compounds {
-    display: flex;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-}
-
-.compound-tag {
-    padding: 0.3rem 0.8rem;
-    background-color: #f0f4f8;
+.food-name {
+    font-size: 2rem;
+    font-weight: 600;
     color: rgb(4, 61, 85);
-    border-radius: 4px;
-    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
 }
 
-.card-actions {
+.food-badges {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.evidence-badge,
+.safety-badge,
+.anti-inflammatory-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.evidence-badge {
+    background-color: rgba(46, 125, 50, 0.1);
+    color: #2e7d32;
+}
+
+.safety-badge,
+.anti-inflammatory-badge {
+    background-color: rgba(4, 61, 85, 0.1);
+    color: rgb(4, 61, 85);
+}
+
+.food-description {
+    color: rgba(4, 61, 85, 0.7);
+    margin-bottom: 1.5rem;
+    margin-top: 0.5rem;
+    flex-grow: 1;
+    line-height: 1.5;
+}
+
+.food-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    color: #95a5a6;
+}
+
+.food-category {
+    background-color: #f0f0f0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+}
+
+/* Food Actions */
+.food-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: auto;
+}
+
+/* Food List View */
+.foods-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* Match grid gap */
+}
+
+.list-item-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-item-info {
+    flex: 1;
+}
+
+.list-item-actions {
     display: flex;
     gap: 1rem;
+    align-items: center;
 }
 
 /* Buttons */
-.btn {
-    display: inline-flex;
+.btn-primary,
+.btn-secondary {
+    display: flex;
     align-items: center;
     gap: 0.6rem;
-    padding: 1rem 1.6rem;
-    border: 2px solid transparent;
-    border-radius: 8px;
+    padding: 0.8rem 1.6rem;
+    border: none;
+    border-radius: 40px;
     font-size: 1.4rem;
     font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
     cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn svg {
-    width: 18px;
-    height: 18px;
+    transition: all 0.3s ease;
 }
 
 .btn-primary {
     background-color: rgb(4, 61, 85);
     color: white;
-    border-color: rgb(4, 61, 85);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .btn-primary:hover {
-    background-color: rgb(3, 48, 67);
-    border-color: rgb(3, 48, 67);
+    background-color: rgba(4, 61, 85, 0.85);
+    transform: translateY(-1px);
 }
 
 .btn-secondary {
-    background-color: white;
+    background-color: rgba(4, 61, 85, 0.08);
     color: rgb(4, 61, 85);
-    border-color: #e5e5e5;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .btn-secondary:hover {
-    border-color: rgb(4, 61, 85);
+    background-color: rgba(4, 61, 85, 0.15);
+    transform: translateY(-1px);
 }
 
-.btn-success {
+/* In Stack button state */
+.btn-primary.in-stack {
     background-color: #27ae60;
-    color: white;
-    border-color: #27ae60;
 }
 
-.btn-success:hover {
-    background-color: #219a52;
-    border-color: #219a52;
-}
-
-.btn-danger {
+.btn-primary.in-stack:hover {
     background-color: #e74c3c;
-    color: white;
-    border-color: #e74c3c;
-}
-
-.btn-danger:hover {
-    background-color: #c0392b;
-    border-color: #c0392b;
-}
-
-.btn-icon {
-    padding: 0.8rem;
-    background: none;
-    border: none;
     cursor: pointer;
-    color: #e74c3c;
 }
 
-.btn-icon:hover {
-    opacity: 0.8;
+.btn-primary svg,
+.btn-secondary svg {
+    width: 16px;
+    height: 16px;
 }
 
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+/* Templates Grid */
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
 }
 
-.modal-content {
-    position: relative;
+.template-card {
     background-color: white;
-    margin: 5% auto;
-    padding: 3rem;
-    width: 90%;
-    max-width: 700px;
-    max-height: 80vh;
-    overflow-y: auto;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.modal-close {
-    position: absolute;
-    right: 2rem;
-    top: 2rem;
-    font-size: 3rem;
-    font-weight: 300;
+    border: 2px solid #e5e5e5;
+    border-radius: 2.2rem;
+    padding: 2.5rem;
+    transition: all 0.3s ease;
     cursor: pointer;
-    color: #7f8c8d;
 }
 
-.modal-close:hover {
-    color: rgb(4, 61, 85);
+.template-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    border-color: rgba(4, 61, 85, 0.3);
 }
 
-.modal-content h2 {
-    font-size: 2.4rem;
-    margin-bottom: 2rem;
-    color: rgb(4, 61, 85);
-}
-
-.modal-section {
-    margin-bottom: 2rem;
-}
-
-.modal-section h3 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    color: rgb(4, 61, 85);
-}
-
-.modal-scores {
+.template-icon {
+    width: 48px;
+    height: 48px;
+    background-color: rgb(4, 61, 85);
+    border-radius: 12px;
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.score-item {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    background-color: #f8fbfc;
-    border-radius: 8px;
+    justify-content: center;
+    margin-bottom: 1.5rem;
 }
 
-.score-label {
-    font-weight: 500;
+.template-icon svg {
+    width: 28px;
+    height: 28px;
+    color: white;
 }
 
-.score-value {
-    font-size: 1.8rem;
-    font-weight: 700;
+.template-name {
+    font-size: 2rem;
+    font-weight: 600;
     color: rgb(4, 61, 85);
+    margin-bottom: 1rem;
 }
 
-.compounds-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
+.template-description {
+    color: rgba(4, 61, 85, 0.7);
+    margin-bottom: 1.5rem;
 }
 
-.modal-actions {
-    margin-top: 2rem;
-    display: flex;
-    gap: 1rem;
+.template-count {
+    font-size: 1.4rem;
+    color: rgba(4, 61, 85, 0.5);
 }
 
-/* Stack Management */
+/* My Stack */
+.stack-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
 .stack-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stack-header h2 {
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: rgb(4, 61, 85);
 }
 
 .stack-actions {
@@ -524,253 +512,373 @@ body {
     gap: 1rem;
 }
 
-.stack-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+.clear-stack-btn,
+.export-stack-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.6rem;
+    border: 2px solid #e5e5e5 !important;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.clear-stack-btn:hover {
+    border: 2px solid #e74c3c !important;
+    color: #e74c3c;
+}
+
+.export-stack-btn:hover {
+    border: 2px solid #27ae60 !important;
+    color: #27ae60;
+}
+
+/* Stack Items */
+.stack-items {
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
     margin-bottom: 3rem;
 }
 
 .stack-item {
-    background: white;
+    background-color: white;
     border: 2px solid #e5e5e5;
     border-radius: 8px;
     padding: 1.5rem;
-}
-
-.stack-item-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
 }
 
-.stack-item-header h4 {
-    font-size: 1.6rem;
+.stack-item-info h4 {
+    font-size: 1.8rem;
     font-weight: 600;
     color: rgb(4, 61, 85);
-}
-
-.stack-item-content {
-    font-size: 1.4rem;
-    color: rgba(4, 61, 85, 0.8);
-}
-
-.stack-summary {
-    background: #f8fbfc;
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-}
-
-.stack-summary h3 {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    color: rgb(4, 61, 85);
-}
-
-.summary-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-
-.stat {
-    display: flex;
-    flex-direction: column;
-}
-
-.stat-label {
-    font-size: 1.3rem;
-    color: rgba(4, 61, 85, 0.7);
-    margin-bottom: 0.4rem;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: rgb(4, 61, 85);
-}
-
-/* Synergies Section */
-.synergies-section {
-    margin-top: 3rem;
-}
-
-.synergies-section h3 {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    color: rgb(4, 61, 85);
-}
-
-.synergies-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.synergy-card {
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 2px solid #e5e5e5;
-}
-
-.synergy-card.positive {
-    background-color: #f0f9f4;
-    border-color: #27ae60;
-}
-
-.synergy-header {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin-bottom: 1rem;
-    color: #27ae60;
-}
-
-.synergy-card p {
-    font-size: 1.4rem;
     margin-bottom: 0.5rem;
 }
 
-.recommendation {
-    font-style: italic;
-    color: rgba(4, 61, 85, 0.8);
-}
-
-.no-synergies {
-    padding: 2rem;
-    text-align: center;
-    color: rgba(4, 61, 85, 0.6);
-    background: #f8fbfc;
-    border-radius: 8px;
-}
-
-/* Templates */
-.templates-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-}
-
-.template-card {
-    background: white;
-    border: 2px solid #e5e5e5;
-    border-radius: 12px;
-    padding: 2rem;
-    transition: all 0.2s;
-}
-
-.template-card:hover {
-    box-shadow: 0 4px 12px rgba(4, 61, 85, 0.1);
-    transform: translateY(-2px);
-}
-
-.template-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.template-header h3 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: rgb(4, 61, 85);
-}
-
-.popularity {
-    padding: 0.3rem 0.8rem;
-    background-color: #ffeaa7;
-    color: #f39c12;
-    border-radius: 4px;
-    font-size: 1.2rem;
-    font-weight: 500;
-}
-
-.template-description {
-    font-size: 1.4rem;
-    color: rgba(4, 61, 85, 0.8);
-    margin-bottom: 1rem;
-}
-
-.template-stats {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 1rem;
+.stack-item-dose {
     font-size: 1.4rem;
     color: rgba(4, 61, 85, 0.7);
 }
 
-.template-foods {
+.stack-item-controls {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.dose-multiplier {
+    width: 80px;
+    padding: 0.6rem 1rem;
+    border: 2px solid #e5e5e5;
+    border-radius: 6px;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+.remove-from-stack-btn {
+    padding: 0.6rem;
+    border: none;
+    background-color: #fee;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.remove-from-stack-btn:hover {
+    background-color: #fcc;
+}
+
+.remove-from-stack-btn svg {
+    width: 20px;
+    height: 20px;
+    color: #e74c3c;
+}
+
+/* Interactions Panel */
+.interactions-panel {
+    background-color: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+}
+
+.interactions-panel.hidden {
+    display: none;
+}
+
+.interactions-panel h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #856404;
     margin-bottom: 1.5rem;
 }
 
-.food-tag {
-    padding: 0.3rem 0.8rem;
-    background-color: #f0f4f8;
-    color: rgb(4, 61, 85);
-    border-radius: 4px;
-    font-size: 1.2rem;
+.interactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.more {
-    padding: 0.3rem 0.8rem;
-    background-color: rgba(4, 61, 85, 0.1);
-    color: rgb(4, 61, 85);
-    border-radius: 4px;
-    font-size: 1.2rem;
-    font-weight: 500;
+.interaction-item {
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
 }
 
-/* Empty States */
-.empty-stack {
+.interaction-severity {
+    font-weight: 600;
+    margin-right: 0.8rem;
+}
+
+.interaction-severity.mild {
+    color: #ff9800;
+}
+
+.interaction-severity.moderate {
+    color: #f44336;
+}
+
+.interaction-severity.positive {
+    color: #4caf50;
+}
+
+/* Stack Summary */
+.stack-summary {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-around;
+}
+
+.summary-item {
+    text-align: center;
+}
+
+.summary-label {
+    display: block;
+    font-size: 1.4rem;
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+}
+
+.summary-value {
+    display: block;
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Empty State */
+.empty-state {
     text-align: center;
     padding: 4rem;
-    color: rgba(4, 61, 85, 0.6);
-    font-size: 1.6rem;
+    color: #95a5a6;
 }
 
-/* Notification */
-.notification {
+.empty-state svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1.5rem;
+    opacity: 0.3;
+}
+
+.empty-state p {
+    font-size: 1.8rem;
+}
+
+/* Modal */
+.modal {
     position: fixed;
-    top: 2rem;
-    right: 2rem;
-    padding: 1.5rem 2rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 2rem;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.modal-close svg {
+    width: 24px;
+    height: 24px;
+    color: #7f8c8d;
+}
+
+.modal-body {
+    padding: 3rem;
+    overflow-y: auto;
+    max-height: 90vh;
+}
+
+.modal-header {
+    margin-bottom: 2rem;
+}
+
+.modal-header h2 {
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.modal-badges {
+    display: flex;
     gap: 1rem;
-    transform: translateX(400px);
-    transition: transform 0.3s ease;
-    z-index: 2000;
 }
 
-.notification.show {
-    transform: translateX(0);
+.modal-section {
+    margin-bottom: 2.5rem;
 }
 
-.notification.success {
-    border-left: 4px solid #27ae60;
+.modal-section h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1rem;
 }
 
-.notification.success svg {
-    color: #27ae60;
+.modal-section ul {
+    list-style: none;
+}
+
+.modal-section li {
+    padding: 0.5rem 0;
+    padding-left: 2rem;
+    position: relative;
+}
+
+.modal-section li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #3498db;
+}
+
+/* Evidence Breakdown */
+.evidence-breakdown {
+    background-color: rgba(4, 61, 85, 0.03);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(4, 61, 85, 0.1);
+}
+
+.evidence-breakdown p {
+    margin-bottom: 1.5rem;
+}
+
+.evidence-breakdown p:last-child {
+    margin-bottom: 0;
+}
+
+.evidence-breakdown strong {
+    color: rgb(4, 61, 85);
+    font-weight: 600;
 }
 
 /* Responsive Design */
+
+/* Tablet breakpoint - 990px */
+@media (max-width: 990px) {
+    .food-stack-app {
+        padding: 0 2rem;
+    }
+    
+    .foods-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .templates-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile breakpoint - 768px */
 @media (max-width: 768px) {
     .food-stack-app {
-        padding: 0 1.5rem;
+        padding: 1rem;
     }
     
     .app-header h1 {
         font-size: 2.4rem;
+    }
+    
+    .tab-navigation {
+        gap: 0.5rem;
+        overflow-x: visible;
+        justify-content: space-between;
+    }
+    
+    .tab-button {
+        padding: 0.8rem 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-size: 1.3rem;
+        flex: 1;
+        min-width: 0;
+        text-align: center;
+    }
+    
+    .tab-button span {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        font-size: 1.3rem;
+    }
+    
+    /* Special handling for stack count */
+    .stack-count {
+        display: inline !important;
+        background: none !important;
+        padding: 0 !important;
+        font-weight: 600;
+        font-size: inherit;
+        color: inherit;
+        border-radius: 0;
+    }
+    
+    .tab-button svg {
+        width: 24px;
+        height: 24px;
     }
     
     .controls-bar {
@@ -778,26 +886,233 @@ body {
         align-items: stretch;
     }
     
+    .controls-right {
+        justify-content: space-between;
+    }
+    
     .foods-grid {
         grid-template-columns: 1fr;
     }
     
-    .tab-navigation {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    .templates-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stack-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+    
+    .stack-summary {
+        flex-direction: column;
+        gap: 2rem;
+    }
+}
+
+/* Loading State */
+.loading {
+    text-align: center;
+    padding: 4rem;
+    color: #7f8c8d;
+}
+
+.loading:after {
+    content: "...";
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { content: "."; }
+    33% { content: ".."; }
+    66% { content: "..."; }
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-2 { margin-top: 2rem; }
+.mb-2 { margin-bottom: 2rem; }
+.mt-3 { margin-top: 3rem; }
+.mb-3 { margin-bottom: 3rem; }
+
+/* Small mobile breakpoint - 750px */
+@media (max-width: 750px) {
+    body {
+        font-size: 1.5rem;
+    }
+    
+    .app-header h1 {
+        font-size: 2.8rem;
+    }
+    
+    .tab-button {
+        font-size: 1.2rem;
+        padding: 0.7rem 0.8rem;
+    }
+    
+    .tab-button svg {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .food-name {
+        font-size: 1.8rem;
+    }
+    
+    .food-description {
+        font-size: 1.4rem;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        font-size: 1.3rem;
+        padding: 0.7rem 1.4rem;
+    }
+    
+    .food-header .view-details-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 1.2rem;
+    }
+    
+    .evidence-badge,
+    .safety-badge,
+    .anti-inflammatory-badge {
+        font-size: 1.1rem;
+        padding: 0.3rem 0.6rem;
+    }
+}
+
+/* Product Banner */
+.product-banner {
+    background-color: #C0EBFA;
+    padding: 2.5rem 3rem;
+    margin: 3rem auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: rgb(4, 61, 85);
+    border-radius: 12px;
+    grid-column: 1 / -1;
+    max-width: 100%;
+}
+
+.product-banner:hover {
+    background-color: #b3e2f5;
+    transform: translateX(2px);
+}
+
+.product-banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    max-width: 114rem;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.product-banner-text {
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: rgb(4, 61, 85);
+}
+
+.product-banner-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.product-banner:hover .product-banner-arrow {
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: translateX(5px);
+}
+
+.product-banner-arrow svg {
+    width: 24px;
+    height: 24px;
+    color: rgb(4, 61, 85);
+}
+
+/* Banner in list view */
+.foods-list .product-banner {
+    margin: 2rem 0;
+}
+
+/* Responsive adjustments for banner */
+@media (max-width: 768px) {
+    .product-banner {
+        padding: 2rem 2rem;
+        margin: 2rem 0;
+        width: 100%;
+    }
+    
+    /* Disable hover effects on mobile */
+    .product-banner:hover {
+        background-color: #C0EBFA;
+        transform: none;
+    }
+    
+    .product-banner:hover .product-banner-arrow {
+        background-color: rgba(255, 255, 255, 0.5);
+        transform: none;
+    }
+    
+    .product-banner-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .product-banner-text {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+}
+
+/* Extra small mobile - 480px */
+@media (max-width: 480px) {
+    .tab-button {
+        padding: 0.6rem 0.6rem;
+        font-size: 1.1rem;
+    }
+    
+    .tab-button span {
+        font-size: 1.1rem;
+    }
+    
+    .tab-button svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .food-card {
+        padding: 1.5rem;
     }
     
     .modal-content {
-        width: 95%;
-        padding: 2rem;
-        margin: 10% auto;
+        margin: 1rem;
+        max-height: 95vh;
     }
     
-    .stack-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .templates-container {
-        grid-template-columns: 1fr;
+    .product-banner-text {
+        font-size: 1.4rem;
     }
 }
