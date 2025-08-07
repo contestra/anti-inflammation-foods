@@ -76,6 +76,67 @@ Use `food-stack-builder.html` for local development and testing.
 - Safari (latest)
 - Edge (latest)
 
+## Mobile App Deployment (Planned)
+
+### PWA (Progressive Web App) Strategy
+The app will be converted to a PWA for mobile app store distribution:
+
+#### Features
+- **Offline Support**: Full functionality without internet connection
+- **App Store Presence**: Available on iOS App Store and Google Play Store
+- **Install Prompt**: Users can install directly from website
+- **One Codebase**: Same code serves web, iOS, and Android users
+- **Auto Updates**: App updates when website updates (no app store review delays)
+
+#### Implementation Plan
+1. **PWA Creation**:
+   - Add `manifest.json` for app configuration
+   - Add `service-worker.js` for offline caching
+   - Add app icons and splash screens
+   - Configure installability features
+
+2. **App Store Distribution**:
+   - Use PWABuilder to generate app packages
+   - Deploy standalone version for mobile (outside Shopify)
+   - Submit to Apple App Store ($99/year developer account required)
+   - Submit to Google Play Store ($25 one-time developer account required)
+
+#### Mobile App URLs
+- **Foods App**: Will be deployed separately for PWA packaging
+- **Supplements App**: Companion app with same architecture
+
+#### Technical Stack
+- **PWA Wrapper**: PWABuilder (Microsoft's free tool)
+- **Hosting**: Netlify/Vercel for standalone mobile versions
+- **Store Packages**: .ipa (iOS) and .aab (Android)
+
+#### App Store Approval Requirements
+To ensure approval (especially Apple App Store), the PWA will include:
+
+##### Native-Like Features
+- **Smooth Animations**: Page transitions, card animations, gesture responses
+- **Touch Gestures**: Swipe to delete, pull to refresh, drag to reorder
+- **Haptic Feedback**: Vibration on actions (Android)
+- **Native UI Elements**: Platform-specific styling (iOS vs Android)
+- **Offline Functionality**: Full app works without internet
+- **Local Data Persistence**: Save user's diet across sessions
+
+##### Unique Value Beyond Website
+- **Daily Reminders**: In-app notifications for meal planning
+- **Export Features**: PDF/CSV export of diet plans
+- **Personalization**: Save multiple diet profiles
+- **Quick Actions**: Long-press shortcuts on app icon
+- **Widget Support**: Home screen widgets (Android)
+- **Share Functionality**: Share diet plans with others
+
+##### Apple App Store Specific
+Apple may reject simple web wrappers. To avoid rejection:
+- **Not Just a Website**: Includes features that work better as an app
+- **Meaningful Offline**: Full functionality when disconnected
+- **Platform Integration**: Uses device features appropriately
+- **Performance**: Fast loading, smooth scrolling, no web-like delays
+- **Professional Polish**: Custom splash screens, proper app icons, no broken links
+
 ## License
 
 Proprietary - CONTESTRA
