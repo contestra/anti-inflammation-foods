@@ -4,7 +4,7 @@ A web application for building personalized anti-inflammatory diet protocols bas
 
 ## Features
 
-- **100 Science-Backed Foods**: Comprehensive database of anti-inflammatory foods with evidence scores
+- **115 Science-Backed Foods**: Comprehensive database of anti-inflammatory foods with evidence scores
 - **Diet Templates**: Pre-built diet plans for different health goals
 - **Personalized Diet Builder**: Create and customize your own anti-inflammatory diet
 - **Evidence-Based Scoring**: Foods rated on 0-10 scale based on clinical studies
@@ -35,16 +35,19 @@ A web application for building personalized anti-inflammatory diet protocols bas
 
 Use `food-stack-builder.html` for local development and testing.
 
-## Food Categories
+## Food Categories (11 total)
 
-- Fatty Fish
-- Berries
-- Leafy Greens
-- Nuts & Seeds
-- Spices & Herbs
-- Healthy Fats
-- Beverages
-- Cruciferous
+- Fatty Fish (10 foods)
+- Berries (10 foods)
+- Leafy Greens (10 foods)
+- Nuts & Seeds (10 foods)
+- Spices & Herbs (16 foods)
+- Healthy Fats (10 foods)
+- Beverages (10 foods)
+- Cruciferous (10 foods)
+- Mushrooms (7 foods)
+- Citrus (5 foods)
+- Other (9 foods)
 
 ## Scoring System
 

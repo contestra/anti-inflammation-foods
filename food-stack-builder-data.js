@@ -1,6 +1,6 @@
 // Anti-Inflammatory Foods Database
-// 100 scientifically-validated foods with evidence-based scoring
-// Version 1.0 - December 2024
+// 115 scientifically-validated foods with evidence-based scoring
+// Version 1.1 - December 2024
 
 // Evidence Score Calculation (0-10 scale)
 // Clinically reproducible scoring based on study counts
