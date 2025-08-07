@@ -1,0 +1,23 @@
+# IDE and system files
+.claude/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Old React files (kept for reference but not needed for production)
+anti_inflammatory_foods_app.tsx
+react_foods_app.ts
+update_app.tsx
+
+# Embedded repos
+anti-inflammatory-supplements/
+
+# Node modules (if any)
+node_modules/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp

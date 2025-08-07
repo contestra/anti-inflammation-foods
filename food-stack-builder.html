@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anti-Inflammatory Foods Stack Builder - Test</title>
+    <link rel="stylesheet" href="food-stack-builder.css">
+</head>
+<body>
+    <div class="food-stack-app">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>Anti-Inflammatory Foods Stack Builder</h1>
+            <p class="app-subtitle">Build your personalized anti-inflammatory diet with 100 scientifically-validated foods</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-navigation">
+            <button class="tab-button active" data-tab="browse">
+                <i data-lucide="search"></i>
+                Browse Foods
+            </button>
+            <button class="tab-button" data-tab="mystack">
+                <i data-lucide="layers"></i>
+                My Stack
+                <span class="stack-count">0</span>
+            </button>
+            <button class="tab-button" data-tab="templates">
+                <i data-lucide="layout-template"></i>
+                Diet Templates
+            </button>
+        </nav>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Browse Tab -->
+            <div id="browse-tab" class="tab-panel active">
+                <!-- Controls Bar -->
+                <div class="controls-bar">
+                    <div class="search-container">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" id="search-input" class="search-input" placeholder="Search foods...">
+                    </div>
+                    <div class="control-group">
+                        <select id="sort-select" class="sort-select">
+                            <option value="antiInflammatory">Sort by Anti-Inflammatory Score</option>
+                            <option value="name">Sort by Name</option>
+                        </select>
+                        <div class="view-buttons">
+                            <button class="view-button active" data-view="grid">
+                                <i data-lucide="grid"></i>
+                            </button>
+                            <button class="view-button" data-view="list">
+                                <i data-lucide="list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="category-filters">
+                    <button class="category-chip active" data-category="all">All</button>
+                    <button class="category-chip" data-category="Fatty Fish">Fatty Fish</button>
+                    <button class="category-chip" data-category="Berries">Berries</button>
+                    <button class="category-chip" data-category="Leafy Greens">Leafy Greens</button>
+                    <button class="category-chip" data-category="Nuts & Seeds">Nuts & Seeds</button>
+                    <button class="category-chip" data-category="Spices & Herbs">Spices & Herbs</button>
+                    <button class="category-chip" data-category="Healthy Fats">Healthy Fats</button>
+                    <button class="category-chip" data-category="Beverages">Beverages</button>
+                    <button class="category-chip" data-category="Cruciferous">Cruciferous</button>
+                </div>
+
+                <!-- Foods Container -->
+                <div id="foods-container" class="foods-grid">
+                    <!-- Foods will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <!-- My Stack Tab -->
+            <div id="mystack-tab" class="tab-panel">
+                <div class="stack-header">
+                    <h2>My Anti-Inflammatory Food Stack</h2>
+                    <div class="stack-actions">
+                        <button class="btn btn-secondary clear-stack-btn">
+                            <i data-lucide="trash-2"></i>
+                            Clear Stack
+                        </button>
+                        <button class="btn btn-primary export-stack-btn">
+                            <i data-lucide="download"></i>
+                            Export Stack
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stack Summary -->
+                <div id="stack-summary" class="stack-summary">
+                    <h3>Stack Summary</h3>
+                    <!-- Summary will be dynamically loaded here -->
+                </div>
+
+                <!-- Synergies Section -->
+                <div class="synergies-section">
+                    <h3>Food Synergies</h3>
+                    <div id="synergies-container" class="synergies-container">
+                        <!-- Synergies will be dynamically loaded here -->
+                    </div>
+                </div>
+
+                <!-- Stack Items -->
+                <div id="stack-container" class="stack-container">
+                    <!-- Stack items will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <!-- Templates Tab -->
+            <div id="templates-tab" class="tab-panel">
+                <h2>Popular Diet Templates</h2>
+                <p style="margin-bottom: 2rem; color: rgba(4, 61, 85, 0.7);">
+                    Start with evidence-based diet templates tailored for specific health goals
+                </p>
+                <div id="templates-container" class="templates-container">
+                    <!-- Templates will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Food Details -->
+    <div id="food-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modal-content">
+                <!-- Food details will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Load JavaScript Files -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="food-stack-builder-data.js"></script>
+    <script src="food-stack-builder.js"></script>
+</body>
+</html>
